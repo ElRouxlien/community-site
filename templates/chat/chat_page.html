@@ -1,0 +1,66 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2>Chat avec {{ agent.name }}</h2>
+
+<div id="chat-box"
+     style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 1rem;">
+</div>
+
+{% if error %}
+<div class="alert alert-warning">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="POST" class="mt-3">
+    {% csrf_token %}
+    <textarea name="message" rows="3" class="form-control"
+              placeholder="Écrivez un message..."></textarea>
+    <button class="btn btn-primary mt-2">Envoyer</button>
+</form>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+const agentId = {{ agent.id }};
+let lastMessageId = 0;
+
+function loadMessages() {
+    fetch(`/chat/api/${agentId}/`)
+        .then(response => response.json())
+        .then(data => {
+            data.messages.forEach(msg => {
+                if (msg.id > lastMessageId) {
+                    const p = document.createElement("p");
+
+                    let senderHTML = "";
+                    if (msg.is_user) {
+                        senderHTML = `<a href="/users/${msg.sender_id}/">${msg.sender}</a>`;
+                    } else {
+                        senderHTML = `<a href="/agents/${msg.agent_id}/">${msg.sender}</a>`;
+                    }
+
+                    p.innerHTML = `<strong>${senderHTML}</strong> : ${msg.content}`;
+                    chatBox.appendChild(p);
+
+                    lastMessageId = msg.id;
+                }
+            });
+        });
+}
+
+// chargement initial
+loadMessages();
+
+// polling
+setInterval(loadMessages, 2000);
+</script>
+
+
+
+
+
+
+{% endblock %}

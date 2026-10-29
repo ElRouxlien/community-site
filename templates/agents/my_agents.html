@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<h2>Mes agents</h2>
+
+{% for agent in agents %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4>{{ agent.name }}</h4>
+            <p>{{ agent.description }}</p>
+
+            <a class="btn btn-primary" href="{% url 'agent-detail' agent.pk %}">Voir</a>
+            <a class="btn btn-warning" href="{% url 'agent-edit' agent.pk %}">Modifier</a>
+            <a class="btn btn-danger" href="{% url 'agent-delete' agent.pk %}">Supprimer</a>
+        </div>
+    </div>
+{% empty %}
+    <p>Vous n'avez encore créé aucun agent.</p>
+{% endfor %}
+
+{% endblock %}

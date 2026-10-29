@@ -1,0 +1,127 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="content-section">
+  <div class="media">
+    <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+    <div class="media-body">
+      <h2 class="account-heading">{{ user.username }}</h2>
+      <p class="text-secondary">{{ user.email }}</p>
+    </div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Profile Info</legend>
+          {{ u_form|crispy }}
+          {{ p_form|crispy }}
+      </fieldset>
+      <div class="form-group">
+          <button class="btn btn-outline-info" type="submit">Update</button>
+      </div>
+  </form>
+
+  <hr>
+
+  <h3>Statistiques visuelles</h3>
+
+  <div class="mt-4">
+      <h5>Messages envoyés par agent</h5>
+      <canvas id="agentChart" height="120"></canvas>
+  </div>
+
+  {% if request.user == user %}
+  <div class="mt-5">
+      <h5>Messages envoyés par jour</h5>
+      <canvas id="dayChart" height="120"></canvas>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+    // --- GRAPH 1 : Messages par agent ---
+    const agentLabels = [
+        {% for item in messages_per_agent %}
+            "{{ item.agent__name }}",
+        {% endfor %}
+    ];
+
+    const agentCounts = [
+        {% for item in messages_per_agent %}
+            {{ item.count }},
+        {% endfor %}
+    ];
+
+    if (document.getElementById("agentChart")) {
+        new Chart(
+            document.getElementById("agentChart"),
+            {
+                type: 'bar',
+                data: {
+                    labels: agentLabels,
+                    datasets: [{
+                        label: 'Messages envoyés',
+                        data: agentCounts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            }
+        );
+    }
+
+      {% if request.user == user %}
+
+      // -------------------------------------------------------
+      // 🔵 GRAPH 2 : Messages envoyés par jour
+      // -------------------------------------------------------
+
+      const dayLabels = [
+          {% for item in messages_per_day %}
+              "{{ item.date }}",
+          {% endfor %}
+      ];
+
+      const dayCounts = [
+          {% for item in messages_per_day %}
+              {{ item.count }},
+          {% endfor %}
+      ];
+
+      const ctxDay = document.getElementById('dayChart').getContext('2d');
+
+      new Chart(ctxDay, {
+          type: 'line',
+          data: {
+              labels: dayLabels,
+              datasets: [{
+                  label: 'Messages par jour',
+                  data: dayCounts,
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  tension: 0.3,
+                  borderWidth: 2,
+                  pointRadius: 3
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: { beginAtZero: true }
+              }
+          }
+      });
+
+  {% endif %}
+
+</script>
+
+
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+    <h2 class="mb-4">Agents publics</h2>
+
+    {% for agent in agents %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <a href="{% url 'agent-detail' agent.pk %}">{{ agent.name }}</a>
+                <p>{{ agent.description }}</p>
+                <small>Créé par : {{ agent.owner.username }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <p>Aucun agent pour l’instant.</p>
+    {% endfor %}
+{% endblock %}

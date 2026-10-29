@@ -1,0 +1,55 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+
+<h2>Statistiques de vos agents IA</h2>
+
+<hr>
+
+<h4>Général</h4>
+<ul>
+    <li><strong>Total de messages envoyés :</strong> {{ total_messages }}</li>
+    <li><strong>Total de réponses IA reçues :</strong> {{ total_ai_messages }}</li>
+</ul>
+
+<hr>
+
+<h4>Messages par agent</h4>
+{% if messages_per_agent %}
+<table class="table table-bordered">
+    <tr>
+        <th>Agent</th>
+        <th>Messages envoyés</th>
+    </tr>
+    {% for item in messages_per_agent %}
+    <tr>
+        <td>{{ item.agent__name }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Vous n'avez encore discuté avec aucun agent.</p>
+{% endif %}
+
+<hr>
+
+<h4>Activité par jour</h4>
+{% if messages_per_day %}
+<table class="table table-bordered">
+    <tr>
+        <th>Date</th>
+        <th>Messages envoyés</th>
+    </tr>
+    {% for item in messages_per_day %}
+    <tr>
+        <td>{{ item.date }}</td>
+        <td>{{ item.count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Aucune activité enregistrée.</p>
+{% endif %}
+
+{% endblock %}

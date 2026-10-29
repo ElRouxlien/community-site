@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+db.sqlite3
+
+# Fichiers envoyés par les utilisateurs (on garde seulement l'avatar par défaut)
+media/*
+!media/default.jpg

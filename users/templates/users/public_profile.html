@@ -1,0 +1,98 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="content-section">
+    <div class="media">
+        <img class="rounded-circle account-img" src="{{ profile_user.profile.image.url }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ profile_user.username }}</h2>
+            <p class="text-secondary">{{ profile_user.email }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h4>Agents créés</h4>
+    {% for agent in agents %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5>{{ agent.name }}</h5>
+                <p>{{ agent.description }}</p>
+                <a class="btn btn-primary" href="{% url 'agent-detail' agent.pk %}">Voir l’agent</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Aucun agent créé.</p>
+    {% endfor %}
+
+    <hr>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <h4>Statistiques</h4>
+
+    <h6>Messages par agent</h6>
+    <canvas id="agentChart" height="120"></canvas>
+
+    {% if messages_per_day %}
+        <h6 class="mt-4">Messages par jour (privé)</h6>
+        <canvas id="dayChart" height="120"></canvas>
+    {% endif %}
+
+    <script>
+        const agentLabels = [
+            {% for item in messages_per_agent %}
+                "{{ item.agent__name }}",
+            {% endfor %}
+        ];
+
+        const agentCounts = [
+            {% for item in messages_per_agent %}
+                {{ item.count }},
+            {% endfor %}
+        ];
+
+        new Chart(document.getElementById('agentChart'), {
+            type: 'bar',
+            data: {
+                labels: agentLabels,
+                datasets: [{
+                    label: 'Messages envoyés',
+                    data: agentCounts,
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        {% if messages_per_day %}
+        const dayLabels = [
+            {% for item in messages_per_day %}
+                "{{ item.date }}",
+            {% endfor %}
+        ];
+        const dayCounts = [
+            {% for item in messages_per_day %}
+                {{ item.count }},
+            {% endfor %}
+        ];
+
+        new Chart(document.getElementById('dayChart'), {
+            type: 'line',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'Messages par jour',
+                    data: dayCounts,
+                    tension: 0.3
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+        {% endif %}
+    </script>
+
+</div>
+
+{% endblock %}

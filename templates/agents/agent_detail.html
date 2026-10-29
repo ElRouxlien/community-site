@@ -1,0 +1,36 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="content-section">
+
+    {% if agent.avatar %}
+        <img src="{{ agent.avatar.url }}" class="img-thumbnail mb-3" style="height: 120px;">
+    {% endif %}
+
+    <h2>{{ agent.name }}</h2>
+
+    
+
+
+    <p class="text-muted">{{ agent.description }}</p>
+    <p class="text-muted">{{ agent.system_prompt }}</p>
+
+
+    <hr>
+
+    <p><strong>Modèle :</strong> {{ agent.model_name }} ({{ agent.model_type }})</p>
+    <p><strong>Cooldown :</strong> {{ agent.cooldown }} secondes</p>
+
+    <a class="btn btn-primary mt-3" href="{% url 'chat-view' agent.pk %}">
+        Discuter avec cet agent 
+    </a>
+    {% if request.user == agent.owner %}
+        <a class="btn btn-warning" href="{% url 'agent-edit' agent.pk %}">Modifier</a>
+        <a class="btn btn-danger" href="{% url 'agent-delete' agent.pk %}">Supprimer</a>
+    {% endif %}
+
+</div>
+
+{% endblock %}
